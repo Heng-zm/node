@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini AI Studio (Web Editor Fullscreen)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="app-sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="logo-link">
+                    <i class="fas fa-brain"></i>
+                    <h1>Gemini AI Studio</h1>
+                </a>
+            </div>
+            <nav class="mode-selector-sidebar">
+                <button id="btnModeGenerate" class="mode-button" title="បង្កើតអត្ថបទ"><i class="fas fa-magic-wand-sparkles"></i><span class="button-text">បង្កើត</span></button>
+                <button id="btnModeChat" class="mode-button" title="ធ្វើការសន្ទនា"><i class="fas fa-comments"></i><span class="button-text">ជជែក</span></button>
+                <button id="btnModeStream" class="mode-button" title="ទទួលបានការឆ្លើយតបជាបន្តបន្ទាប់"><i class="fas fa-water"></i><span class="button-text">ស្ទ្រីម</span></button>
+                <button id="btnModeSummarize" class="mode-button" title="សង្ខេបអត្ថបទវែង"><i class="fas fa-file-lines"></i><span class="button-text">សង្ខេប</span></button>
+                <button id="btnModeTranslate" class="mode-button" title="បកប្រែអត្ថបទ"><i class="fas fa-language"></i><span class="button-text">បកប្រែ</span></button>
+                <button id="btnModeImageQA" class="mode-button" title="សួរសំណួរអំពីរូបភាព"><i class="fas fa-image"></i><span class="button-text">រូបភាព Q&A</span></button>
+                <button id="btnModeSpellCheck" class="mode-button" title="ពិនិត្យអក្ខរាវិរុទ្ធខ្មែរ"><i class="fas fa-spell-check"></i><span class="button-text">ពិនិត្យអក្ខរាវិរុទ្ធ</span></button>
+                <button id="btnModeImageEnhance" class="mode-button" title="ទទួលបានការណែនាំកែលម្អរូបភាព"><i class="fas fa-camera-retro"></i><span class="button-text">កែលម្អរូបភាព</span></button>
+                <button id="btnModeCodeGen" class="mode-button" title="បង្កើតកូដកម្មវិធី"><i class="fas fa-laptop-code"></i><span class="button-text">បង្កើតកូដ</span></button>
+                <button id="btnModeCodeRunner" class="mode-button" title="ដំណើរការកូដកម្មវិធី"><i class="fas fa-play-circle"></i><span class="button-text">ដំណើរការកូដ</span></button>
+                <button id="btnModeWebEditor" class="mode-button" title="កម្មវិធីកែសម្រួលបណ្ដាញ HTML/CSS/JS"><i class="fas fa-code-branch"></i><span class="button-text">Web Editor</span></button>
+            </nav>
+            <div class="sidebar-footer">
+                 <div class="control-item khmer-toggle">
+                    <label for="forceKhmerCheckbox">ឆ្លើយតបខ្មែរ:</label>
+                    <input type="checkbox" id="forceKhmerCheckbox" name="forceKhmer" class="custom-checkbox">
+                </div>
+                 <div class="control-group">
+                    <label for="modelName">ម៉ូដែល:</label>
+                    <select id="modelName">
+                        <option value="gemini-1.5-flash-latest">gemini-1.5-flash</option>
+                        <option value="gemini-1.5-pro-latest">gemini-1.5-pro</option>
+                        <option value="gemini-pro">gemini-pro (text only)</option>
+                    </select>
+                </div>
+            </div>
+        </aside>
+
+        <div class="main-content-wrapper">
+             <header class="main-content-header">
+                <h2>Current Mode: <span id="currentModeTitle">Generate</span></h2>
+            </header>
+            <main class="content-pane">
+                <section id="generalInputSection" class="mode-content active-mode-content">
+                    <div id="chatHistory" class="chat-history card" aria-live="polite"></div>
+                    <div class="input-area card">
+                        <textarea id="promptInput" placeholder="បញ្ចូលប្រអប់បញ្ចូលរបស់អ្នកនៅទីនេះ..." aria-label="Prompt Input" class="form-textarea"></textarea>
+                        <button id="sendButton" class="action-button primary"><i class="fas fa-paper-plane"></i><span class="button-label">ផ្ញើ</span></button>
+                    </div>
+                    <div class="chat-actions">
+                        <button id="exportChatButton" class="action-button secondary"><i class="fas fa-download"></i><span class="button-label">នាំចេញការជជែក</span></button>
+                    </div>
+                </section>
+
+                <section id="summarizeSection" class="mode-content card" style="display: none;">
+                    <h3 class="section-title">សង្ខេបអត្ថបទ</h3>
+                    <div class="input-area full-width"> <textarea id="textToSummarizeInput" placeholder="បិទភ្ជាប់អត្ថបទធំនៅទីនេះ..." aria-label="Text to Summarize" class="form-textarea"></textarea> </div>
+                    <div class="controls-bar summarize-controls">
+                        <label for="summaryLength" class="form-label">ប្រវែង:</label> <select id="summaryLength" class="form-select"><option value="short">ខ្លី</option><option value="medium" selected>មធ្យម</option><option value="long">វែង</option></select>
+                        <button id="summarizeButton" class="action-button primary"><i class="fas fa-file-alt"></i><span class="button-label">សង្ខេប</span></button>
+                    </div>
+                </section>
+
+                <section id="translateSection" class="mode-content card" style="display: none;">
+                     <h3 class="section-title">បកប្រែអត្ថបទ</h3>
+                    <div class="input-area full-width"> <textarea id="textToTranslateInput" placeholder="បញ្ចូលអត្ថបទសម្រាប់បកប្រែ..." aria-label="Text to Translate" class="form-textarea"></textarea> </div>
+                    <div class="controls-bar translate-controls">
+                        <div class="lang-select-group"><label for="sourceLanguage" class="form-label">ពី:</label><select id="sourceLanguage" class="form-select"><option value="auto" selected>ស្វ័យប្រវត្តិ</option><option value="English">English</option><option value="Khmer">ភាសាខ្មែរ</option><option value="French">Français</option><option value="Spanish">Español</option><option value="Chinese">中文</option><option value="Japanese">日本語</option><option value="Korean">한국어</option></select></div>
+                        <div class="lang-select-group"><label for="targetLanguage" class="form-label">ទៅ:</label><select id="targetLanguage" class="form-select"><option value="Khmer" selected>ភាសាខ្មែរ</option><option value="English">English</option><option value="French">Français</option><option value="Spanish">Español</option><option value="Chinese">中文</option><option value="Japanese">日本語</option><option value="Korean">한국어</option></select></div>
+                        <button id="translateButton" class="action-button accent"><i class="fas fa-exchange-alt"></i><span class="button-label">បកប្រែ</span></button>
+                    </div>
+                </section>
+
+                <section id="imageQASection" class="mode-content card" style="display: none;">
+                     <h3 class="section-title">រូបភាព Q&A</h3>
+                     <div class="image-interaction-layout">
+                        <div class="image-upload-wrapper"><label for="imageUploadInput" class="form-label">រូបភាព:</label><input type="file" id="imageUploadInput" class="file-input" accept="image/*"><p class="image-info">គាំទ្រ៖ PNG, JPG, WEBP, HEIC, HEIF</p><img id="imagePreview" src="#" alt="Preview" class="image-preview-box" style="display: none;"/></div>
+                        <div class="image-prompt-wrapper"><textarea id="imageQAPromptInput" placeholder="សំណួរអំពីរូបភាព..." class="form-textarea"></textarea><button id="sendImageQAButton" class="action-button neutral"><i class="fas fa-question-circle"></i><span class="button-label">សួរ</span></button></div>
+                    </div>
+                </section>
+                
+                <section id="imageEnhanceSection" class="mode-content card" style="display: none;">
+                    <h3 class="section-title">កែលម្អរូបភាព (ណែនាំ)</h3>
+                     <div class="image-interaction-layout">
+                        <div class="image-upload-wrapper"><label for="imageEnhanceUploadInput" class="form-label">រូបភាព:</label><input type="file" id="imageEnhanceUploadInput" class="file-input" accept="image/*"><p class="image-info">គាំទ្រ៖ PNG, JPG, WEBP, HEIC, HEIF</p><img id="imageEnhancePreview" src="#" alt="Preview" class="image-preview-box" style="display: none;"/></div>
+                        <div class="image-prompt-wrapper"><textarea id="imageEnhancePromptInput" placeholder="ផ្ដោតលើការកែលម្អ..." class="form-textarea"></textarea><button id="sendImageEnhanceButton" class="action-button orange"><i class="fas fa-lightbulb"></i><span class="button-label">ណែនាំ</span></button></div>
+                    </div>
+                </section>
+
+                <section id="spellCheckSection" class="mode-content" style="display: none;">
+                    <h3 class="section-title">ពិនិត្យអក្ខរាវិរុទ្ធខ្មែរ</h3>
+                    <div class="input-area full-width"><textarea id="textToSpellCheckInput" placeholder="បញ្ចូលអត្ថបទខ្មែរ..." class="form-textarea"></textarea></div>
+                    <div class="controls-bar spellcheck-controls"><button id="spellCheckButton" class="action-button info"><i class="fas fa-check-double"></i><span class="button-label">ពិនិត្យ</span></button></div>
+                    <div class="spellcheck-results-area">
+                         <div class="spellcheck-output-container result-box"><div class="result-box-header"><h4>អត្ថបទដើម</h4><div class="output-actions"><button class="utility-button speak-button" id="speakOriginalSpellCheck"><i class="fas fa-volume-up"></i></button><button class="utility-button copy-button" id="copyOriginalSpellCheck"><i class="fas fa-copy"></i></button></div></div><pre id="spellCheckOriginalOutput"></pre></div>
+                        <div class="spellcheck-output-container result-box corrected-box"><div class="result-box-header"><h4>អត្ថបទកែ</h4><div class="output-actions"><button class="utility-button speak-button" id="speakCorrectedSpellCheck"><i class="fas fa-volume-up"></i></button><button class="utility-button copy-button" id="copyCorrectedSpellCheck"><i class="fas fa-copy"></i></button></div></div><pre id="spellCheckCorrectedOutput" class="corrected"></pre></div>
+                    </div>
+                    <div class="api-metadata" id="spellCheckMetadataOutput"></div>
+                </section>
+
+                <section id="codeGenSection" class="mode-content card" style="display: none;">
+                    <h3 class="section-title">បង្កើតកូដ</h3>
+                    <div class="input-area full-width"><textarea id="codeDescriptionInput" placeholder="ពណ៌នាអំពីកូដ..." class="form-textarea"></textarea></div>
+                    <div class="controls-bar code-gen-controls">
+                        <div class="lang-select-group"><label for="codeLanguageSelect" class="form-label">ភាសា:</label><select id="codeLanguageSelect" class="form-select"><option value="Python">Python</option><option value="JavaScript">JavaScript</option><option value="Java">Java</option><option value="CSharp">C#</option><option value="CPlusPlus">C++</option><option value="HTML">HTML</option><option value="CSS">CSS</option><option value="SQL">SQL</option><option value="Ruby">Ruby</option><option value="Go">Go</option><option value="Rust">Rust</option><option value="PHP">PHP</option><option value="Swift">Swift</option><option value="Kotlin">Kotlin</option><option value="TypeScript">TypeScript</option></select></div>
+                        <button id="generateCodeButton" class="action-button primary"><i class="fas fa-cogs"></i><span class="button-label">បង្កើត</span></button>
+                    </div>
+                </section>
+
+                <section id="codeRunnerSection" class="mode-content card" style="display: none;">
+                    <h3 class="section-title">ដំណើរការកូដ</h3>
+                    <div class="mb-4"><label for="runnerLanguageSelect" class="form-label">ភាសា:</label><select id="runnerLanguageSelect" class="form-select"><option value="javascript" selected>JavaScript</option><option value="python">Python</option></select></div>
+                    <div class="input-area full-width mb-4"><textarea id="codeToRunInput" placeholder="បិទភ្ជាប់កូដ..." class="form-textarea code-input"></textarea></div>
+                    <div class="controls-bar code-runner-controls">
+                        <p class="text-xs text-muted-color"><i class="fas fa-exclamation-triangle text-yellow-500 mr-1"></i> ការព្រមាន៖ ប្រុងប្រយ័ត្ន។</p>
+                        <button id="runCodeButton" class="action-button primary"><i class="fas fa-play"></i><span class="button-label">ដំណើរការ</span></button>
+                    </div>
+                    <div class="code-runner-output-area result-box mt-6"><h4 class="text-lg font-medium mb-2">លទ្ធផល:</h4><pre id="codeRunnerOutput"></pre></div>
+                </section>
+                
+                <section id="webEditorSection" class="mode-content" style="display: none;">
+                    <h3 class="section-title">Live Web Editor (HTML, CSS, JS)</h3>
+                    <div class="web-editor-layout">
+                        <div class="editor-pane html-pane">
+                            <label for="htmlCodeInput" class="editor-label">HTML</label>
+                            <textarea id="htmlCodeInput" class="code-editor-textarea" spellcheck="false" placeholder="<div>Hello World!</div>"></textarea>
+                        </div>
+                        <div class="editor-pane css-pane">
+                            <label for="cssCodeInput" class="editor-label">CSS</label>
+                            <textarea id="cssCodeInput" class="code-editor-textarea" spellcheck="false" placeholder="div { color: blue; }"></textarea>
+                        </div>
+                        <div class="editor-pane js-pane">
+                            <label for="jsCodeInput" class="editor-label">JavaScript</label>
+                            <textarea id="jsCodeInput" class="code-editor-textarea" spellcheck="false" placeholder="console.log('Hello from JS!');"></textarea>
+                        </div>
+                        <div class="preview-pane">
+                            <div class="preview-header">
+                                <label class="editor-label">មើល​ជាមុន (Preview)</label>
+                                <button id="fullscreenPreviewButton" class="utility-button" title="មើលពេញអេក្រង់ (Fullscreen Preview)">
+                                    <i class="fas fa-expand"></i> <span class="button-label-sm">ពេញអេក្រង់</span>
+                                </button>
+                            </div>
+                            <iframe id="livePreviewFrame" title="Live Code Preview" sandbox="allow-scripts allow-modals allow-popups allow-forms"></iframe>
+                        </div>
+                    </div>
+                    <div class="web-editor-console card" style="display: none;">
+                        <h4><i class="fas fa-terminal"></i> Preview Console / Errors</h4>
+                        <pre id="webEditorConsoleOutput"></pre>
+                    </div>
+                </section>
+
+                <div class="response-section result-box" id="mainResponseArea" style="display:none;">
+                    <div class="result-box-header">
+                         <h2>ការឆ្លើយតប (Response)</h2>
+                         <div class="response-actions">
+                            <button class="utility-button speak-button" id="speakMainResponseButton" title="និយាយការឆ្លើយតប"><i class="fas fa-volume-up"></i></button>
+                            <button class="utility-button copy-button" id="copyMainResponseButton" title="ចម្លងការឆ្លើយតប"><i class="fas fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div class="response-content-wrapper">
+                        <pre id="responseOutput" aria-live="assertive">ការឆ្លើយតប AI របស់អ្នកនឹងបង្ហាញនៅទីនេះ។</pre>
+                        <div class="loading-overlay" id="responseLoadingOverlay" style="display: none;">
+                            <div class="spinner"></div>
+                            <p>កំពុងដំណើរការ...</p>
+                        </div>
+                    </div>
+                    <div class="api-metadata" id="mainMetadataOutput"></div>
+                </div>
+            </main>
+
+            <footer class="app-footer">
+                <button id="clearAllButton" class="action-button danger"><i class="fas fa-trash-alt"></i><span class="button-label">សម្អាតទាំងអស់</span></button>
+            </footer>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

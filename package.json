@@ -1,0 +1,30 @@
+{
+  "name": "gemini-node-server",
+  "version": "1.0.0",
+  "description": "Node.js server for Gemini AI API with frontend, including Khmer support and multiple features.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "gemini",
+    "ai",
+    "node",
+    "express",
+    "khmer",
+    "multimodal",
+    "spellcheck",
+    "tts",
+    "image-enhancement",
+    "api-metadata",
+    "copy-to-clipboard"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google/generative-ai": "^0.12.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  }
+}
